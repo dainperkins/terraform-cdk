@@ -134,3 +134,43 @@ This will synthesize a Terraform configuration with the value overwritten.
   }
 }
 ```
+
+## Using an Escape Hatch for dynamic blocks
+
+In the context of the CDK iterating through a list is best done by using a native array and looping through it. There might be instances where you want to loop through a dynamic value, like a `TerraformVariable` or a dynamic resource output and here escape hatches need to be used.
+
+In this example we loop through the ports passed as `TerraformVariable` to add ingress values.
+The first argument of `addOverride` needs to be `dynamic.<attribute_name>`, the second argument has a `for_each` value set to the list you want to iterate over. The `content` value is set to the value, when referencing values from the list one needs to take the attribute as base for the reference: `"${<attribute_name>.value.nested_value}"`.
+
+```ts
+const ports = new TerraformVariable(this, "ports", {
+  type: "list",
+  default: [22, 80, 443, 5432],
+});
+
+const sg = new SecurityGroup(this, "sec1grp", {
+  name: "security1",
+  vpcId: "vpcs",
+  egress: [
+    {
+      fromPort: 0,
+      toPort: 0,
+      cidrBlocks: ["0.0.0.0/0"],
+      protocol: "-1",
+    },
+  ],
+});
+sg.addOverride("dynamic.ingress", {
+  for_each: ports.listValue,
+  content: {
+    fromPort: "${ingress.value}",
+    toPort: "${ingress.value}",
+    cidrBlocks: ["0.0.0.0/0"],
+    protocol: "-1",
+  },
+});
+
+new TerraformOutput(this, "portsout", {
+  value: ports.listValue,
+});
+```

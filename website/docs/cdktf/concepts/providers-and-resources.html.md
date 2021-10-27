@@ -341,12 +341,11 @@ When you run `cdktf synth`, CDKTF generates a Terraform configuration with the v
 
 #### Using an Escape Hatch for dynamic blocks
 
-Use an escape hatch when you want to loop through a dynamic value that is unknown until after Terraform provisions infrastructure. For example, you may need to loop through a `TerraformVariable` or a dynamic resource output. 
+Use an escape hatch when you want to loop through a dynamic value that is unknown until after Terraform provisions infrastructure. For example, you may need to loop through a `TerraformVariable` or a dynamic resource output.
 
 The first argument of `addOverride` needs to be `dynamic.<attribute_name>`, create a `for_each` value for the second argument and set it to the list you want to iterate over. When you reference values from the list, take the attribute as base for the reference. For example, use `"${<attribute_name>.value.nested_value}"`.
 
 The TypeScript example below adds ingress values by looping through the ports passed as `TerraformVariable`.
-
 
 ```ts
 const ports = new TerraformVariable(this, "ports", {
@@ -374,9 +373,5 @@ sg.addOverride("dynamic.ingress", {
     cidrBlocks: ["0.0.0.0/0"],
     protocol: "-1",
   },
-});
-
-new TerraformOutput(this, "portsout", {
-  value: ports.listValue,
 });
 ```

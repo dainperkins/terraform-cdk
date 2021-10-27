@@ -375,3 +375,28 @@ sg.addOverride("dynamic.ingress", {
   },
 });
 ```
+
+Using overrides are only necessary when dynamic values are involved, if you are using static values you can iterate through the array as in every other program.
+
+```ts
+const ports = [22, 80, 443, 5432];
+
+new SecurityGroup(this, "sec1grp", {
+  name: "security1",
+  vpcId: "vpcs",
+  egress: [
+    {
+      fromPort: 0,
+      toPort: 0,
+      cidrBlocks: ["0.0.0.0/0"],
+      protocol: "-1",
+    },
+  ],
+  ingress: ports.map((port) => ({
+    fromPort: port,
+    toPort: port,
+    cidrBlocks: ["0.0.0.0/0"],
+    protocol: "-1",
+  })),
+});
+```

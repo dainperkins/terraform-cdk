@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@cdktf/provider-azurerm": "^0.2.9",
-    "cdktf": "^0.6.2",
+    "cdktf": "^0.20.12",
     "constructs": "^10.0.5"
   },
   "devDependencies": {
